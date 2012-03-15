@@ -1,0 +1,132 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="lib/jquery/jquery-ui.min.css" />
+    <link rel="stylesheet" href="lib/Smoothness/jquery.ui.all.css" />
+
+    <script type="text/javascript" src="lib/jquery-1.5.1.js"></script>
+    <script type="text/javascript" src="lib/jquery-ui.1.9m5.js"></script>
+    <script type="text/javascript" src="lib/underscore-min.js"></script>
+    <script type="text/javascript" src="lib/backbone.js"></script>
+
+    <script type="text/javascript" src="lib/jquery.rdfquery.min.js"></script>
+
+    <script type="text/javascript" src="lib/vie/vie-latest.debug.js"></script>
+
+    <script type="text/javascript" src="lib/vie.autocomplete.js"></script>
+
+    <script>
+    $(document).ready(function(){ _.defer(function(){
+        window.vie = new VIE();
+        vie.namespaces.add("diseasome",    "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/");
+        vie.namespaces.add("drugbank",     "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/");
+        vie.namespaces.add("drugcategory", "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugcategory/");
+        vie.namespaces.add("drugtargets",  "http://www4.wiwiss.fu-berlin.de/drugbank/resource/targets/");
+        vie.namespaces.add("drugtype",     "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugtype/");
+        vie.namespaces.add("drugs",        "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/");
+        vie.namespaces.add("dosageforms",  "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/");
+        vie.namespaces.add("side_effects", "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/");
+        vie.namespaces.add("genes",        "http://www4.wiwiss.fu-berlin.de/diseasome/resource/genes/");
+        vie.namespaces.add("diseases",     "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/");
+        vie.namespaces.add("sider-drugs",  "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/");
+        vie.namespaces.add("dailymed",     "http://www4.wiwiss.fu-berlin.de/dailymed/resource/dailymed/");
+        vie.namespaces.add("dailymed-drugs","http://www4.wiwiss.fu-berlin.de/dailymed/resource/drugs/");
+        vie.namespaces.add("intervention", "http://data.linkedct.org/resource/intervention/");
+        vie.namespaces.add("wdbp",         "http://www.dbpedia.org/resource/");
+        vie.namespaces.add("dbp",          "http://dbpedia.org/resource/");
+        vie.namespaces.add("condition",    "http://data.linkedct.org/resource/condition/");
+        vie.namespaces.add("disease",      "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/");
+        vie.namespaces.add("diseaseClass", "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseaseClass/");
+        
+        vie.use(new vie.StanbolService({
+            url : "http://dev.iks-project.eu:8081",
+            entityhubSite: "ehealth",
+            proxyDisabled: true,
+            getSources: [{
+                uri: "www4.wiwiss.fu-berlin.de",
+                label: "ehealth"
+            }]
+        }));
+
+        $('.search')
+        .vieAutocomplete({
+            vie: vie,
+            select: function(e, ui){
+                log(ui);
+                showEntity(ui.item.key);
+            },
+            urifield: jQuery("#urifield"),
+            debug: false,
+            labelProperties: [
+                "skos:prefLabel",
+                "rdfs:label",
+                "schema:name",
+                "foaf:name"
+            ],
+            field: "skos:prefLabel"
+        });
+        window.log = function(msg) {
+            jQuery("#results").append( JSON.stringify(msg) + "<br/" + ">" );
+        }
+        window.showEntity = function(entityUri){
+            entityUri = entityUri.replace(/^<|>$/g, "");
+            vie.load({entity:entityUri}).using("stanbol").execute()
+            .success(function(entities){
+                var selectedEntity = _(entities).detect(function(ent){
+                    return ent.getSubject().indexOf(entityUri) != -1;
+                });
+                showInInfoBox(selectedEntity);
+                console.log(selectedEntity);
+            });
+        }
+        window.showInInfoBox = function(entity){
+            jQuery(".info").accordion().accordion("destroy").html("");
+            _(_(entity.attributes).keys()).each(function(key){
+                if(key.indexOf("@") == 0) return;
+                var property = key;
+                var value = entity.get(key);
+                var val = "";
+                if (typeof value == "string"){
+                    val = value.replace(/^<|>$/g, "");
+                } else if(value instanceof Array){
+                    val = "<ul>";
+                    _(value).each(function(v){
+                        var label = vie.namespaces.isUri(v) ? "<a href='javascript:showEntity(\"" + v + "\")'>" + 
+                        vie.namespaces.curie(v) + "</a>" : v;
+                        val += "<li>" + label + "</li>";
+                    });
+                    val += "</ul>";
+                } else {
+                    val = JSON.stringify(value);
+                }
+                jQuery(".info")
+                .append("<h3><a href='#'>" + vie.namespaces.curie(key) + "</a></h3>")
+                .append("<div><p>" + val + "</p></div>")
+            });
+            jQuery(".info").accordion({autoHeight: false});
+            return false;
+        }
+    })});
+    </script>
+    <body xmlns:sioc    = "http://rdfs.org/sioc/ns#"
+         xmlns:schema   = "http://www.schema.org/"
+         xmlns:enhancer = "http://fise.iks-project.eu/ontology/"
+         xmlns:dc       = "http://purl.org/dc/terms/">
+        <a href="https://github.com/szabyg/VIE.autocomplete"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+
+        <h2>VIE-health</h2>
+        <span style="background: fff;">
+            <label for="search">Search:</label> <input id="search" size="60" class="search"/>
+            <br/>
+            <label for="urifield">Selected URI:</label> <input id="urifield" size="60"/>
+        </span>
+            <div class="info">
+            </div>
+            <div>
+                <h4>selected:</h4>
+                <div id="results"></div>
+<!--                Hyperthyroidism-->
+            </div>
+        </div>
+    </body>
+</html>
