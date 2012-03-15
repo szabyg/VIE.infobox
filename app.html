@@ -15,6 +15,22 @@
 
     <script type="text/javascript" src="lib/vie.autocomplete.js"></script>
 
+    <style>
+        body {
+            font-family: Verdana;
+            font-size: 15px;
+        }
+        .info {
+            width: 40%;
+            height: 60%;
+            overflow: auto;
+            position: absolute;
+            right: 5px;
+        }
+        .freetext {
+            
+        }
+    </style>
     <script>
     $(document).ready(function(){ _.defer(function(){
         window.vie = new VIE();
@@ -37,6 +53,10 @@
         vie.namespaces.add("condition",    "http://data.linkedct.org/resource/condition/");
         vie.namespaces.add("disease",      "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/");
         vie.namespaces.add("diseaseClass", "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseaseClass/");
+        vie.namespaces.add("ingredient",   "http://www4.wiwiss.fu-berlin.de/dailymed/resource/ingredient/");
+        vie.namespaces.add("fu-berlin",   "http://www4.wiwiss.fu-berlin.de/");
+        
+        var hiddenList = ["entityhub2", "foaf:primaryTopic"];
         
         vie.use(new vie.StanbolService({
             url : "http://dev.iks-project.eu:8081",
@@ -82,6 +102,12 @@
         window.showInInfoBox = function(entity){
             jQuery(".info").accordion().accordion("destroy").html("");
             _(_(entity.attributes).keys()).each(function(key){
+                for(var i = 0;i < hiddenList.length; i++){
+                    var hiddenItem = hiddenList[i];
+                    if(vie.namespaces.curie(key).indexOf(hiddenItem) === 0){
+                        return;
+                    }
+                }
                 if(key.indexOf("@") == 0) return;
                 var property = key;
                 var value = entity.get(key);
@@ -106,6 +132,9 @@
             jQuery(".info").accordion({autoHeight: false});
             return false;
         }
+        jQuery(".freetext").annotate({
+            
+        });
     })});
     </script>
     <body xmlns:sioc    = "http://rdfs.org/sioc/ns#"
@@ -120,8 +149,8 @@
             <br/>
             <label for="urifield">Selected URI:</label> <input id="urifield" size="60"/>
         </span>
-            <div class="info">
-            </div>
+            <div class="info"></div>
+            <div class="freetext"></div>
             <div>
                 <h4>selected:</h4>
                 <div id="results"></div>
