@@ -1,3 +1,6 @@
+# TODO 
+# * Load and visualize config when an entity is loaded
+# * add property title config to each portlet
 debugger
 Vhealth = {}
 # Initialize page
@@ -75,9 +78,9 @@ this.Vhealth = _(Vhealth).extend
       selectedEntity = _(entities).detect((ent) ->
         ent.getSubject().indexOf(entityUri) isnt -1
       )
+      # show Entity label
       jQuery(".entityLabel").html selectedEntity.get('skos:prefLabel')
       # # handle types
-      # TODO filter first, then create save buttons with saveConfig(typeUri) calls on click
       # hide owl:Thing as type
       types = _([selectedEntity.get('@type')]).flatten()
       types = _(types).filter (type) ->
@@ -92,6 +95,7 @@ this.Vhealth = _(Vhealth).extend
         .click ->
           type = jQuery(@).button "option", "entityType"
           Vhealth.saveConfig type.toString()
+      # 
       Vhealth.showInInfoBox selectedEntity
       event = new jQuery.Event("viehealthEntitySelection")
       event.selectedEntity = selectedEntity
