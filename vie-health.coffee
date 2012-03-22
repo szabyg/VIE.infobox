@@ -55,6 +55,7 @@ jQuery(document).ready ->
       
 # Define Vhealth methods
 this.Vhealth = _(Vhealth).extend
+  lsName: "vhealthConfig"
   # uri to curie
   shortenUri: (u) ->
     try
@@ -150,12 +151,19 @@ this.Vhealth = _(Vhealth).extend
             jQuery(@).portlet "collapse"
   # Extract config JSONs from the collector elements and save it in the local storage
   saveConfig: (type) ->
+    localStorage[Vhealth.lsName] ?= "{}"
+    ls = null
+    try
+      ls = JSON.parse localStorage[Vhealth.lsName]
+    catch e
+      ls = {}
     collectors = jQuery ".collector"
-    config = _(collectors).map (collector) ->
+    ls[type] = _(collectors).map (collector) ->
       _(jQuery(".vhealth-portlet", collector)).map (portlet) ->
-        jQuery(portlet).portlet('option', 'key')
-    console.info type, config
-    # TODO save config to localStorage as typeUri: config mapping
+        property: jQuery(portlet).portlet('option', 'key')
+    console.info type, ls[type]
+    localStorage[Vhealth.lsName] = JSON.stringify ls
+    console.info localStorage[Vhealth.lsName]
 
   # Initialize namespaces for nicer 
   addNamespaces: ->
