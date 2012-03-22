@@ -4,7 +4,11 @@
     <link rel="stylesheet" href="lib/jquery/jquery-ui.min.css" />
     <link rel="stylesheet" href="lib/Smoothness/jquery.ui.all.css" />
 
-    <script type="text/javascript" src="lib/jquery-1.5.1.js"></script>
+    <link rel="stylesheet" href="css/hallo.css" />
+    <link rel="stylesheet" href="css/annotate.css" />
+
+<!--    <script type="text/javascript" src="lib/jquery-1.5.1.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
     <script type="text/javascript" src="lib/jquery-ui.1.9m5.js"></script>
     <script type="text/javascript" src="lib/underscore-min.js"></script>
     <script type="text/javascript" src="lib/backbone.js"></script>
@@ -14,128 +18,53 @@
     <script type="text/javascript" src="lib/vie/vie-latest.debug.js"></script>
 
     <script type="text/javascript" src="lib/vie.autocomplete.js"></script>
+    <script type="text/javascript" src="lib/hallo.js"></script>
+    <script type="text/javascript" src="lib/annotate.js"></script>
+    <script type="text/javascript" src="lib/coffee-script.js"></script>
+    <script type="text/coffeescript" src="vie-health.coffee" name="vie-health"></script>
 
     <style>
         body {
             font-family: Verdana;
             font-size: 15px;
+            background-color: #eee;
         }
         .info {
-            width: 40%;
-            height: 60%;
+            width: 24%;
+            height: 30%;
+            margin-top: 50px;
+            border: 1px red solid;
             overflow: auto;
-            position: absolute;
+	        float: right; 
             right: 5px;
         }
         .freetext {
-            
+            width: 55%;
         }
+        .columns {
+            width: 100%;
+            float: left;
+            padding: 15px 5px;
+        }
+        .collector {
+            height: 100px;
+            width: 24%;
+            border: 1px red solid;
+            padding: 4px;
+	        float: left; 
+        }
+	    .portlets { 
+	        /* width: 170px; */
+	        padding-bottom: 100px; 
+	    }
+	    .portlet { margin: 0 1em 1em 0; }
+	    .portlet-header { margin: 0.3em; padding-bottom: 4px; padding-left: 0.2em; }
+	    .portlet-header .ui-icon { float: right; }
+	    .portlet-content { padding: 0.4em; }
+	    .ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important; height: 50px !important; }
+	    .ui-sortable-placeholder * { visibility: hidden; }
     </style>
     <script>
-    $(document).ready(function(){ _.defer(function(){
-        window.vie = new VIE();
-        vie.namespaces.add("diseasome",    "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/");
-        vie.namespaces.add("drugbank",     "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/");
-        vie.namespaces.add("drugcategory", "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugcategory/");
-        vie.namespaces.add("drugtargets",  "http://www4.wiwiss.fu-berlin.de/drugbank/resource/targets/");
-        vie.namespaces.add("drugtype",     "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugtype/");
-        vie.namespaces.add("drugs",        "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/");
-        vie.namespaces.add("dosageforms",  "http://www4.wiwiss.fu-berlin.de/drugbank/resource/dosageforms/");
-        vie.namespaces.add("side_effects", "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/");
-        vie.namespaces.add("genes",        "http://www4.wiwiss.fu-berlin.de/diseasome/resource/genes/");
-        vie.namespaces.add("diseases",     "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/");
-        vie.namespaces.add("sider-drugs",  "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/");
-        vie.namespaces.add("dailymed",     "http://www4.wiwiss.fu-berlin.de/dailymed/resource/dailymed/");
-        vie.namespaces.add("dailymed-drugs","http://www4.wiwiss.fu-berlin.de/dailymed/resource/drugs/");
-        vie.namespaces.add("intervention", "http://data.linkedct.org/resource/intervention/");
-        vie.namespaces.add("wdbp",         "http://www.dbpedia.org/resource/");
-        vie.namespaces.add("dbp",          "http://dbpedia.org/resource/");
-        vie.namespaces.add("condition",    "http://data.linkedct.org/resource/condition/");
-        vie.namespaces.add("disease",      "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/");
-        vie.namespaces.add("diseaseClass", "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseaseClass/");
-        vie.namespaces.add("ingredient",   "http://www4.wiwiss.fu-berlin.de/dailymed/resource/ingredient/");
-        vie.namespaces.add("fu-berlin",   "http://www4.wiwiss.fu-berlin.de/");
-        
-        var hiddenList = ["entityhub2", "foaf:primaryTopic"];
-        
-        vie.use(new vie.StanbolService({
-            url : "http://dev.iks-project.eu:8081",
-            entityhubSite: "ehealth",
-            proxyDisabled: true,
-            getSources: [{
-                uri: "www4.wiwiss.fu-berlin.de",
-                label: "ehealth"
-            }]
-        }));
-
-        $('.search')
-        .vieAutocomplete({
-            vie: vie,
-            select: function(e, ui){
-                log(ui);
-                showEntity(ui.item.key);
-            },
-            urifield: jQuery("#urifield"),
-            debug: false,
-            labelProperties: [
-                "skos:prefLabel",
-                "rdfs:label",
-                "schema:name",
-                "foaf:name"
-            ],
-            field: "skos:prefLabel"
-        });
-        window.log = function(msg) {
-            jQuery("#results").append( JSON.stringify(msg) + "<br/" + ">" );
-        }
-        window.showEntity = function(entityUri){
-            entityUri = entityUri.replace(/^<|>$/g, "");
-            vie.load({entity:entityUri}).using("stanbol").execute()
-            .success(function(entities){
-                var selectedEntity = _(entities).detect(function(ent){
-                    return ent.getSubject().indexOf(entityUri) != -1;
-                });
-                showInInfoBox(selectedEntity);
-                console.log(selectedEntity);
-            });
-        }
-        window.showInInfoBox = function(entity){
-            jQuery(".info").accordion().accordion("destroy").html("");
-            _(_(entity.attributes).keys()).each(function(key){
-                for(var i = 0;i < hiddenList.length; i++){
-                    var hiddenItem = hiddenList[i];
-                    if(vie.namespaces.curie(key).indexOf(hiddenItem) === 0){
-                        return;
-                    }
-                }
-                if(key.indexOf("@") == 0) return;
-                var property = key;
-                var value = entity.get(key);
-                var val = "";
-                if (typeof value == "string"){
-                    val = value.replace(/^<|>$/g, "");
-                } else if(value instanceof Array){
-                    val = "<ul>";
-                    _(value).each(function(v){
-                        var label = vie.namespaces.isUri(v) ? "<a href='javascript:showEntity(\"" + v + "\")'>" + 
-                        vie.namespaces.curie(v) + "</a>" : v;
-                        val += "<li>" + label + "</li>";
-                    });
-                    val += "</ul>";
-                } else {
-                    val = JSON.stringify(value);
-                }
-                jQuery(".info")
-                .append("<h3><a href='#'>" + vie.namespaces.curie(key) + "</a></h3>")
-                .append("<div><p>" + val + "</p></div>")
-            });
-            jQuery(".info").accordion({autoHeight: false});
-            return false;
-        }
-        jQuery(".freetext").annotate({
-            
-        });
-    })});
     </script>
     <body xmlns:sioc    = "http://rdfs.org/sioc/ns#"
          xmlns:schema   = "http://www.schema.org/"
@@ -143,19 +72,41 @@
          xmlns:dc       = "http://purl.org/dc/terms/">
         <a href="https://github.com/szabyg/vie-health"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
-        <h2>VIE-health</h2>
+        <h1>VIE-health</h1>
         <span style="background: fff;">
             <label for="search">Search:</label> <input id="search" size="60" class="search"/>
             <br/>
             <label for="urifield">Selected URI:</label> <input id="urifield" size="60"/>
         </span>
-            <div class="info"></div>
-            <div class="freetext"></div>
+            <div class="info portlets"></div>
+            <h2>Free-text enhancer</h2>
+            <div class="freetext">
+                The main undesirable side-effects of aspirin taken by mouth are gastrointestinal ulcers, stomach bleeding, and tinnitus, especially in higher doses. In children and adolescents, aspirin is no longer indicated to control flu-like symptoms or the symptoms of chickenpox or other viral illnesses, because of the risk of Reye's syndrome.[6]
+
+Aspirin is part of a group of medications called nonsteroidal anti-inflammatory drugs (NSAIDs), but differs from them in the mechanism of action.[clarification needed] Though it, and others in its group called the salicylates, have similar effects (antipyretic, anti-inflammatory, analgesic) to the other NSAIDs and inhibit the same enzyme cyclooxygenase, aspirin (but not the other salicylates) does so in an irreversible manner and, unlike others, affect more the COX-1 variant than the COX-2 variant of the enzyme.[7] For example, NSAIDs' antiplatelet effects normally last in the order of hours, whereas aspirin's effects last for days (until the body replaces the suppressed platelets). Hence, when physicians tell patients to stop taking NSAIDs, they usually imply aspirin as well.
+            </div>
+            <a href="javascript:Vhealth.showEntity('http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945')">load Aspirin</a><br/>
+            <a href="javascript:Vhealth.showEntity('http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372')">load Epilepsy</a><br/>
+            <h2 class="entityLabel"></h2>
+            <div class="entity-types"></div>
+            <div class="columns">
+                <div class="collector portlets">
+<!--                    <div class="portlet" title="Feeds">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>-->
+                </div>
+                <div class="collector portlets">
+                </div>
+                <div class="collector portlets">
+                </div>
+                <div class="collector portlets">
+                </div>
+            </div>
             <div>
                 <h4>selected:</h4>
                 <div id="results"></div>
+                <button id="getConfig">get config</button>
 <!--                Hyperthyroidism-->
             </div>
+            
         </div>
     </body>
 </html>
