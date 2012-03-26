@@ -1,61 +1,9 @@
 # TODO 
 # * Load and visualize config when an entity is loaded
 # * add property title config to each portlet
+# * add visualization options
 debugger
 Vhealth = {}
-# Initialize page
-jQuery(document).ready ->
-  _.defer ->
-    jQuery('.portlet').portlet()
-    vie = Vhealth.vie = new VIE()
-    Vhealth.addNamespaces()
-    Vhealth.hiddenList = [ "entityhub2", "foaf:primaryTopic" ]
-    vie.use new vie.StanbolService(
-      url: "http://dev.iks-project.eu:8081"
-      enhancerUrlPostfix: "/enhancer/chain/ehealth"
-      entityhubSite: "ehealth"
-      proxyDisabled: true
-      getSources: [
-        uri: "www4.wiwiss.fu-berlin.de"
-        label: "ehealth"
-      ]
-    )
-    jQuery(".search").vieAutocomplete
-      vie: vie
-      select: (e, ui) ->
-        Vhealth.log ui
-        jQuery(".info *").remove()
-        Vhealth.showEntity ui.item.key
-
-      urifield: jQuery("#urifield")
-      debug: false
-      labelProperties: [ "skos:prefLabel", "rdfs:label", "schema:name", "foaf:name" ]
-      field: "skos:prefLabel"
-    jQuery(".freetext").hallo
-      plugins:
-        halloannotate:
-          vie: vie
-          select: (ui) ->
-            console.info ui
-          decline: (ui) ->
-            console.info ui
-        halloformat: {}
-
-      showAlways: true
-      editable: true
-
-    jQuery(".portlets").sortable 
-      connectWith: ".column"
-      scroll: false
-    jQuery(".portlets").disableSelection()
-    jQuery("#getConfig").button()
-    .click ->
-      collectors = jQuery ".collector"
-      config = _(collectors).map (collector) ->
-        _(jQuery(".vhealth-portlet", collector)).map (portlet) ->
-          jQuery(portlet).portlet('option', 'title')
-      console.info config
-      
 # Define Vhealth methods
 this.Vhealth = _(Vhealth).extend
   lsName: "vhealthConfig"
@@ -73,13 +21,20 @@ this.Vhealth = _(Vhealth).extend
 
   # Load and show entity
   showEntity: (entityUri) ->
-    entityUri = entityUri.replace(/^<|>$/g, "")
     @vie.load(entity: entityUri).using("stanbol").execute().success (entities) ->
       selectedEntity = _(entities).detect((ent) ->
         ent.getSubject().indexOf(entityUri) isnt -1
       )
+      jQuery(".infoBox").html("").infobox
+        vie: Vhealth.vie
+        config: ->
+          localStorage[Vhealth.lsName]
+        entity: selectedEntity
+        valueProcess: (value, fieldConfig) ->
+          Vhealth.humanReadableValue value
+        keyProcess: Vhealth.shortenUri
       # show Entity label
-      jQuery(".entityLabel").html selectedEntity.get('skos:prefLabel')
+      jQuery(".entityLabel").html VIE.Util.getPreferredLangForPreferredProperty selectedEntity, ['skos:prefLabel', 'rdfs:label'], ["en", "de"]
       # # handle types
       # hide owl:Thing as type
       types = _([selectedEntity.get('@type')]).flatten()
@@ -96,14 +51,14 @@ this.Vhealth = _(Vhealth).extend
           type = jQuery(@).button "option", "entityType"
           Vhealth.saveConfig type.toString()
       # 
-      Vhealth.showInInfoBox selectedEntity
+      Vhealth.showInPropertyList selectedEntity
       event = new jQuery.Event("viehealthEntitySelection")
       event.selectedEntity = selectedEntity
       jQuery(".collector .vhealth-portlet").trigger event
       console.log selectedEntity
 
-  # The infoBox is where all the draggable properties are listed
-  showInInfoBox: (entity) ->
+  # The propertyList is where all the draggable properties are listed
+  showInPropertyList: (entity) ->
     jQuery(".info").html ""
     _(_(entity.attributes).keys()).each (key) =>
       i = 0
@@ -139,14 +94,17 @@ this.Vhealth = _(Vhealth).extend
     val
   # Process one property as portlet in the info box
   createPortlet: (title, content, entity, key) ->
+    # create portlet markup and init a portlet on it
     jQuery("<div title='#{title}'>#{content}</div>").appendTo(".info").portlet
       open: false
       entity: entity
       key: key
+      configEl: "<input class='field-label' value='#{title}'/>"
+      # when it's created subscribe on the event 'viehealthEntitySelection'
       create: ->
         jQuery(@).bind "viehealthEntitySelection", (e) =>
           entity = e.selectedEntity
-          content = Vhealth.humanReadableValue entity.get title
+          content = Vhealth.humanReadableValue entity.get key
           if content
             jQuery(@).portlet "setContent", content
             jQuery(@).portlet "expand"
@@ -165,6 +123,7 @@ this.Vhealth = _(Vhealth).extend
     ls[type] = _(collectors).map (collector) ->
       _(jQuery(".vhealth-portlet", collector)).map (portlet) ->
         property: jQuery(portlet).portlet('option', 'key')
+        fieldLabel: jQuery('input.field-label', portlet).val()
     console.info type, ls[type]
     localStorage[Vhealth.lsName] = JSON.stringify ls
     console.info localStorage[Vhealth.lsName]
@@ -198,31 +157,33 @@ this.Vhealth = _(Vhealth).extend
     @vie.namespaces.add "dbpedia-page",    "http://dbpedia.org/"
 
 # Plain portlet
-jQuery.widget "Vhealth.portlet", 
+jQuery.widget "Vie.portlet", 
   options:
     title: "default title"
     open: true
   _create: ->
-    @options.title = @element.attr('title') or @options.title
-    @element.addClass("vhealth-portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all")
+    @options.title = @element.attr("title") or @options.title
+    @element.addClass "vhealth-portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"
     content = @element.contents()
     @element.append """
       <div class='portlet-header'>
         <span class='portlet-header-label'>#{@options.title}</span>
       </div>
-      <div class='portlet-content'></div>
+      <div class='portlet-content vie-portlet-config'>#{@options.configEl}</div>
+      <div class='portlet-content vie-portlet-content'></div>
     """
-    @contentEl = jQuery '.portlet-content', @element
+    @contentEl = jQuery '.vie-portlet-content', @element
+    @configEl = jQuery '.vie-portlet-config', @element
     content.appendTo @contentEl
 
     @headerEl = jQuery '.portlet-header', @element
-    @headerEl.addClass("ui-widget-header ui-corner-all")
-    @headerEl.prepend("<span class='toggle-button ui-icon ui-icon-plusthick'></span>")
-    @headerEl.prepend("<span class='x-button ui-icon ui-icon-closethick'></span>")
+    @headerEl.addClass "ui-widget-header ui-corner-all"
+    @headerEl.prepend "<span class='toggle-button ui-icon ui-icon-plusthick'></span>"
+    @headerEl.prepend "<span class='x-button ui-icon ui-icon-closethick'></span>"
 
     jQuery(".toggle-button, .portlet-header-label", @element).click (event) ->
       jQuery(this).parent().find(".toggle-button").toggleClass("ui-icon-minusthick").toggleClass "ui-icon-plusthick"
-      jQuery(this).parents(".vhealth-portlet:first").find(".portlet-content").toggle()
+      jQuery(this).parents(".vhealth-portlet:first").find(".vie-portlet-content, .vie-portlet-config").toggle()
       event.preventDefault()
     jQuery(".x-button", @element).click =>
       element = @element
@@ -243,11 +204,54 @@ jQuery.widget "Vhealth.portlet",
   collapse: ->
     jQuery(".toggle-button", @element).removeClass("ui-icon-minusthick").addClass "ui-icon-plusthick"
     @contentEl.hide()
+    @configEl.hide()
 
   expand: ->
     jQuery(".toggle-button", @element).addClass("ui-icon-minusthick").removeClass "ui-icon-plusthick"
     @contentEl.show()
+    @configEl.show()
 
   setContent: (newContent) ->
     @contentEl.html newContent
+
+jQuery.widget "Vie.infobox", 
+  options:
+    title: "default title"
+    vie: null
+    entity: null
+    config: {}
+    valueProcess: (value, fieldConfig) ->
+      value
+    keyProcess: (key) ->
+      _(key).escape()
+  _create: ->
+  _init: ->
+    unless @options.entity
+    else
+      @showInfo()
+  showInfo: ->
+    console.info "showing info in", @element
+    types = _([@options.entity.get("@type")])
+    .flatten()
+    .map (typeObj) ->
+      typeObj.toString()
+    config = JSON.parse @options.config() or "{}"
+    console.info config, types
+    matchingConfigs = []
+    for key, value of config
+      if _(types).indexOf(key) isnt -1
+        matchingConfigs.push value
+        console.info "matching config", key, value
+    unless matchingConfigs.length
+      console.warn "No config for", @options.entity
+    console.info "config:", matchingConfigs[0]
+    _(matchingConfigs).each (config) =>
+      _(config).each (box) =>
+        boxEl = jQuery "<div class='box'></div>"
+        _(box).each (field) =>
+          fieldLabel = @options.keyProcess field.property
+          value = @options.entity.get field.property
+          humanReadableValue = @options.valueProcess value, field
+          boxEl.append "<div class='ui-widget-header ui-corner-all'>#{field.fieldLabel}</div><div class='ui-widget-content'>#{humanReadableValue}</div>"
+        @element.append boxEl
 
