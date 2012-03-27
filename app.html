@@ -6,6 +6,7 @@
 
     <link rel="stylesheet" href="css/hallo.css" />
     <link rel="stylesheet" href="css/annotate.css" />
+    <link rel="stylesheet" href="css/font-awesome.css" />
 
     <script type="text/javascript" src="lib/jquery-1.5.1.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
@@ -124,9 +125,15 @@ jQuery(document).ready ->
 	        /* width: 170px; */
 	        padding-bottom: 100px; 
 	    }
+	    .savedTypeButton * {background-color: lightgreen;}
+	    i {
+	        font-size: 100%;
+	        padding: 2px;
+	    }
 	    .portlet { margin: 0 1em 1em 0; }
 	    .portlet-header { margin: 0.3em; padding-bottom: 4px; padding-left: 0.2em; }
-	    .portlet-header .ui-icon { float: right; }
+	    .portlet-header * {padding: 0.3em;}
+	    .portlet-header .ui-icon, .portlet-header .fa-icon { float: right; }
 	    .portlet-content { padding: 0.4em; }
 	    .ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important; height: 50px !important; }
 	    .ui-sortable-placeholder * { visibility: hidden; }
