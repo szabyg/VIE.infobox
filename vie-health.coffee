@@ -60,7 +60,10 @@ this.Vhealth = _(Vhealth).extend
   # The propertyList is where all the draggable properties are listed
   showInPropertyList: (entity) ->
     jQuery(".info").html ""
-    _(_(entity.attributes).keys()).each (key) =>
+    keys = _(entity.attributes).keys()
+    keys = _(keys).sortBy (key) ->
+      Vhealth.shortenUri(key)
+    _(keys).each (key) =>
       i = 0
 
       # Don't process it if it's on the hidden property's list
@@ -99,7 +102,7 @@ this.Vhealth = _(Vhealth).extend
       open: false
       entity: entity
       key: key
-      configEl: "<input class='field-label' value='#{title}'/>"
+      configHtml: "<input class='field-label' value='#{title}'/>"
       # when it's created subscribe on the event 'viehealthEntitySelection'
       create: ->
         jQuery(@).bind "viehealthEntitySelection", (e) =>
@@ -161,6 +164,7 @@ jQuery.widget "Vie.portlet",
   options:
     title: "default title"
     open: true
+    configHtml: ""
   _create: ->
     @options.title = @element.attr("title") or @options.title
     @element.addClass "vhealth-portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"
@@ -169,9 +173,10 @@ jQuery.widget "Vie.portlet",
       <div class='portlet-header'>
         <span class='portlet-header-label'>#{@options.title}</span>
       </div>
-      <div class='portlet-content vie-portlet-config'>#{@options.configEl}</div>
-      <div class='portlet-content vie-portlet-content'></div>
     """
+    if @options.configHtml 
+      @element.append "<div class='portlet-content vie-portlet-config'>#{@options.configHtml}</div>"
+    @element.append "<div class='portlet-content vie-portlet-content'></div>"
     @contentEl = jQuery '.vie-portlet-content', @element
     @configEl = jQuery '.vie-portlet-config', @element
     content.appendTo @contentEl
@@ -246,12 +251,14 @@ jQuery.widget "Vie.infobox",
       console.warn "No config for", @options.entity
     console.info "config:", matchingConfigs[0]
     _(matchingConfigs).each (config) =>
-      _(config).each (box) =>
+      _(config).each (box, i) =>
         boxEl = jQuery "<div class='box'></div>"
         _(box).each (field) =>
           fieldLabel = @options.keyProcess field.property
           value = @options.entity.get field.property
           humanReadableValue = @options.valueProcess value, field
-          boxEl.append "<div class='ui-widget-header ui-corner-all'>#{field.fieldLabel}</div><div class='ui-widget-content'>#{humanReadableValue}</div>"
+          boxEl.append portletEl = jQuery("<div class='' title='#{field.fieldLabel}'>#{humanReadableValue}</div>")
+          portletEl.portlet
+            open: i is 0
         @element.append boxEl
 
