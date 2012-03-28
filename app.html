@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/annotate.css" />
     <link rel="stylesheet" href="css/font-awesome.css" />
 
-    <script type="text/javascript" src="lib/jquery-1.5.1.js"></script>
+<!--    <script type="text/javascript" src="lib/jquery-1.5.1.js"></script>-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
     <script type="text/javascript" src="lib/jquery-ui.1.9m5.js"></script>
     <script type="text/javascript" src="lib/underscore-min.js"></script>
@@ -45,7 +45,7 @@ jQuery(document).ready ->
       vie: vie
       select: (e, ui) ->
         Vhealth.log ui
-        jQuery(".info *").remove()
+        jQuery(".info .content *").remove()
         Vhealth.showEntity ui.item.key
 
       urifield: jQuery "#urifield"
@@ -81,6 +81,10 @@ jQuery(document).ready ->
       vie: vie
       config: ->
         localStorage[Vhealth.lsName]
+    jQuery(".tabs").tabs(
+#      selected: 1
+    )
+#    Vhealth.showEntity 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
     </script>
 
     <style>
@@ -90,40 +94,44 @@ jQuery(document).ready ->
             background-color: #eee;
         }
         .info {
-            width: 24%;
-            height: 30%;
             margin-top: 50px;
-            border: 1px red solid;
+            max-height: 80%;
+            border: 1px lightgreen solid;
             overflow: auto;
-	          /*float: right;*/
-	          position: absolute;
-            right: 5px;
+	          float: left;
+        }
+        .info, .columns {
+            width: 44%;
         }
         .freetext {
-            width: 55%;
+        }
+        .panels {
+            width: 90%;
+            float: left;
         }
         .columns {
-            width: 100%;
-            float: left;
             padding: 15px 5px;
+            float: right;
         }
         .collector {
-            height: 100px;
-            width: 24%;
-            border: 1px red solid;
+            border: 1px #ccc solid;
             padding: 4px;
-	        float: left; 
         }
         .box {
-            border: 1px red solid;
+            border: 1px #ccc solid;
         }
         .infobox {
             width: 30%;
             border: 1px #ccc solid;
+            float: right;
+        }
+        .tabs {
+            width: 60%;
+            float: left;
+            margin: 10px;
         }
 	    .portlets { 
-	        /* width: 170px; */
-	        padding-bottom: 100px; 
+	        padding-bottom: 10px; 
 	    }
 	    .savedTypeButton * {background-color: lightgreen;}
 	    i {
@@ -146,43 +154,52 @@ jQuery(document).ready ->
          xmlns:dc       = "http://purl.org/dc/terms/">
         <a href="https://github.com/szabyg/vie-health"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
-        <h1>VIE-health</h1>
-        <span style="background: fff;">
-            <label for="search">Search:</label> <input id="search" size="60" class="search"/>
-            <br/>
-<!--            <label for="urifield">Selected URI:</label> <input id="urifield" size="60"/>-->
-        </span>
-            <div class="info portlets"></div>
-            <div class="infobox"></div>
-<!-- 
--->
-            <h2>Free-text enhancer</h2>
-            <div class="freetext">
-                The main undesirable side-effects of aspirin taken by mouth are gastrointestinal ulcers, stomach bleeding, and tinnitus, especially in higher doses. In children and adolescents, aspirin is no longer indicated to control flu-like symptoms or the symptoms of chickenpox or other viral illnesses, because of the risk of Reye's syndrome.[6]
-
-Aspirin is part of a group of medications called nonsteroidal anti-inflammatory drugs (NSAIDs), but differs from them in the mechanism of action.[clarification needed] Though it, and others in its group called the salicylates, have similar effects (antipyretic, anti-inflammatory, analgesic) to the other NSAIDs and inhibit the same enzyme cyclooxygenase, aspirin (but not the other salicylates) does so in an irreversible manner and, unlike others, affect more the COX-1 variant than the COX-2 variant of the enzyme.[7] For example, NSAIDs' antiplatelet effects normally last in the order of hours, whereas aspirin's effects last for days (until the body replaces the suppressed platelets). Hence, when physicians tell patients to stop taking NSAIDs, they usually imply aspirin as well.
-            </div>
-            <a href="javascript:Vhealth.showEntity('http://dbpedia.org/resource/Salzburg')">load Salzburg</a><br/><br/>
-            <a href="javascript:Vhealth.showEntity('http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945')">load Aspirin</a><br/>
-            <a href="javascript:Vhealth.showEntity('http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372')">load Epilepsy</a><br/><br/>
-            <a href="javascript:alert(localStorage[Vhealth.lsName])">show config JSON</a><br/>
-            <a href="javascript:delete localStorage[Vhealth.lsName]">clear config</a><br/>
-
-            <h2 class="entityLabel"></h2>
-            <div class="entity-types"></div>
-            <div class="columns">
-                <div class="collector portlets">
-<!--                    <div class="portlet" title="Feeds">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</div>-->
-                </div>
-                <div class="collector portlets">
-                </div>
-                <div class="collector portlets">
-                </div>
-                <div class="collector portlets">
+        <h1>Infobox Configurator (VIE-health-Demo)</h1>
+        <h2 class="entityLabel"></h2>
+        <div><label>History</label><span class="breadcrumbs"/></div>
+        <div class="infobox"></div>
+        <div class="tabs">
+            <ul>
+                <li><a href="#tabs-autocomplete">Autocomplete</a></li>
+                <li><a href="#tabs-config">Config</a></li>
+                <li><a href="#tabs-annotate">Annotate</a></li>
+            </ul>
+            <span style="background: fff;" id="tabs-autocomplete">
+                <label for="search">Search:</label> <input id="search" size="60" class="search"/>
+                <br/>
+    <!--            <label for="urifield">Selected URI:</label> <input id="urifield" size="60"/>-->
+            </span>
+            <div id="tabs-config">
+                <div class="entity-types"></div>
+                <div class="panels"</div>
+                    <div class="info">
+                      <label>Available entity properties</label>
+                      <div class="content portlets"></div>
+                    </div>
+                    <div class="columns">
+                        <label>current configuration</label>
+                        <div class="collector portlets"></div>
+                        <div class="collector portlets"></div>
+                        <div class="collector portlets"></div>
+                        <div class="collector portlets"></div>
+                    </div>
                 </div>
             </div>
-            <h4>selected:</h4>
-            <div id="results"></div>
+            <div id="tabs-annotate">
+                <div class="freetext" >
+                    The main undesirable side-effects of aspirin taken by mouth are gastrointestinal ulcers, stomach bleeding, and tinnitus, especially in higher doses. In children and adolescents, aspirin is no longer indicated to control flu-like symptoms or the symptoms of chickenpox or other viral illnesses, because of the risk of Reye's syndrome.[6]
+
+    Aspirin is part of a group of medications called nonsteroidal anti-inflammatory drugs (NSAIDs), but differs from them in the mechanism of action.[clarification needed] Though it, and others in its group called the salicylates, have similar effects (antipyretic, anti-inflammatory, analgesic) to the other NSAIDs and inhibit the same enzyme cyclooxygenase, aspirin (but not the other salicylates) does so in an irreversible manner and, unlike others, affect more the COX-1 variant than the COX-2 variant of the enzyme.[7] For example, NSAIDs' antiplatelet effects normally last in the order of hours, whereas aspirin's effects last for days (until the body replaces the suppressed platelets). Hence, when physicians tell patients to stop taking NSAIDs, they usually imply aspirin as well.
+                </div>
+            </div>
         </div>
+        <a href="javascript:Vhealth.showEntity('http://dbpedia.org/resource/Salzburg')">load Salzburg</a><br/><br/>
+        <a href="javascript:Vhealth.showEntity('http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945')">load Aspirin</a><br/>
+        <a href="javascript:Vhealth.showEntity('http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372')">load Epilepsy</a><br/><br/>
+        <a href="javascript:alert(localStorage[Vhealth.lsName])">show config JSON</a><br/>
+        <a href="javascript:delete localStorage[Vhealth.lsName]">clear config</a><br/>
+
+<!--            <h4>selected:</h4>-->
+<!--            <div id="results"></div>-->
     </body>
 </html>

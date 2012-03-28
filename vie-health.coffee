@@ -29,9 +29,9 @@ this.Vhealth = _(Vhealth).extend
   showEntity: (entityUri) ->
     @entityUri = entityUri
     @vie.load(entity: entityUri).using("stanbol").execute().success (entities) ->
-      selectedEntity = _(entities).detect((ent) ->
+      selectedEntity = _(entities).detect (ent) ->
         ent.getSubject().indexOf(entityUri) isnt -1
-      )
+      Vhealth.addBreadcrumb entityUri, VIE.Util.getPreferredLangForPreferredProperty selectedEntity, ["skos:prefLabel", "rdfs:label"], ["en", "de"]
       Vhealth.loadConfigEditor selectedEntity
       jQuery(".infoBox").html("").infobox
         vie: Vhealth.vie
@@ -51,6 +51,9 @@ this.Vhealth = _(Vhealth).extend
       event.selectedEntity = selectedEntity
       jQuery(".collector .vhealth-portlet").trigger event
       console.log selectedEntity
+    .fail (e) ->
+      console.error e
+      alert e
 
   showTypesFor: (selectedEntity) ->
     # # handle types
@@ -74,7 +77,7 @@ this.Vhealth = _(Vhealth).extend
 
   # The propertyList is where all the draggable properties are listed
   showInPropertyList: (entity) ->
-    jQuery(".info").html ""
+    jQuery(".info .content").html ""
     keys = _(entity.attributes).keys()
     keys = _(keys).sortBy (key) ->
       Vhealth.shortenUri(key)
@@ -90,7 +93,7 @@ this.Vhealth = _(Vhealth).extend
       return  if key.indexOf("@") is 0
       value = entity.get(key)
       val = @humanReadableValue value
-      @createPortlet Vhealth.shortenUri(key), val, entity, key, ".info"
+      @createPortlet Vhealth.shortenUri(key), val, entity, key, ".info .content"
 
     jQuery(".portlets").sortable connectWith: ".portlets"
     jQuery(".portlets").disableSelection()
@@ -111,7 +114,7 @@ this.Vhealth = _(Vhealth).extend
         Vhealth.createPortlet field.fieldLabel, humanReadableValue, entity, key, configCollectors[i]
 
   getConfig: ->
-    JSON.parse(localStorage[Vhealth.lsName]) or "{}"
+    JSON.parse(localStorage[Vhealth.lsName] or "{}")
 
   # Make a value human readable. Meaning collections to <li>, uris to curie links, etc
   humanReadableValue: (value) ->
@@ -175,7 +178,10 @@ this.Vhealth = _(Vhealth).extend
     console.info localStorage[Vhealth.lsName]
     Vhealth.reloadEntity()
 
-
+  addBreadcrumb: (entityUri, label) ->
+    jQuery(".breadcrumbs").append """
+      &nbsp;| <a href='javascript:Vhealth.showEntity("#{entityUri}")'>#{label}</a>
+    """
   getMatchingConfig: (entity, config) ->
     types = _([entity.get("@type")])
     .flatten()
