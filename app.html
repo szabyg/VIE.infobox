@@ -204,7 +204,8 @@ jQuery(document).ready ->
         <a href="javascript:Vhealth.showEntity('http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945')">load Aspirin</a><br/>
         <a href="javascript:Vhealth.showEntity('http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372')">load Epilepsy</a><br/><br/>
         <a href="javascript:alert(localStorage[Vhealth.lsName])">show config JSON</a><br/>
-        <a href="javascript:delete localStorage[Vhealth.lsName]">clear config</a><br/>
+        <a href="javascript:delete localStorage[Vhealth.lsName];Vhealth.reloadEntity();">clear config</a><br/>
+        <a href="javascript:Vhealth.configInit()"><strong>load initial configuration</strong></a><br/>
 
 <!--            <h4>selected:</h4>-->
 <!--            <div id="results"></div>-->

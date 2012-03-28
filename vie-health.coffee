@@ -203,6 +203,9 @@ this.Vhealth = _(Vhealth).extend
     localStorage[Vhealth.lsName] = JSON.stringify ls
     console.info localStorage[Vhealth.lsName]
     Vhealth.reloadEntity()
+  configInit: ->
+    localStorage[Vhealth.lsName] = '{"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs>":[[{"property":"<http://www.w3.org/2004/02/skos/core#prefLabel>","fieldLabel":"Name"},{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/description>","fieldLabel":"Description"}],[],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target>","fieldLabel":"Targets"}],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/toxicity>","fieldLabel":"Toxicity"}]]}'
+    Vhealth.reloadEntity()
     
   addBreadcrumb: (entityUri, label) ->
     jQuery(".breadcrumbs").append """
