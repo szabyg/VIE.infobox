@@ -204,32 +204,28 @@ jQuery(document).ready ->
         </div>
 
 
-
-        <div class="ui-helper-clearfix ui-corner-all">
-          <div class="portlet-header ui-widget-header ui-corner-all">helpful shortcuts</div>
-          <div class="portlet-content vie-portlet-content">
+        <div style="clear: left;">
   <!--        <button id="loadSbg">load Salzburg</button><br/><br/>-->
-            <button id="loadAspirin">load Aspirin</button><br/>
-            <button id="loadEpilepsy">load Epilepsy</button><br/><br/>
-            <button id="showConfigBtn">show config JSON</button><br/>
-            <button id="clearConfigBtn">clear config</button><br/>
-            <button id="initConfigBtn">load initial configuration</button><br/>
+          <button id="loadAspirin">load Aspirin</button><br/>
+          <button id="loadEpilepsy">load Epilepsy</button><br/><br/>
+          <button id="showConfigBtn">show config JSON</button><br/>
+          <button id="clearConfigBtn">clear config</button><br/>
+          <button id="initConfigBtn">load initial configuration</button><br/>
 
-            <script type="text/coffeescript">
-              jQuery("#loadSbg").button().click ->
-                Vhealth.showEntity 'http://dbpedia.org/resource/Salzburg'
-              jQuery("#loadAspirin").button().click ->
-                Vhealth.showEntity 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
-              jQuery("#loadEpilepsy").button().click ->
-                Vhealth.showEntity 'http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372'
-              jQuery("#showConfigBtn").button().click ->
-                alert(localStorage[Vhealth.lsName])
-              jQuery("#clearConfigBtn").button().click ->
-                delete localStorage[Vhealth.lsName];Vhealth.reloadEntity()
-              jQuery("#initConfigBtn").button().click ->
-                Vhealth.configInit()
-            </script>
-          </div>
+          <script type="text/coffeescript">
+            jQuery("#loadSbg").button().click ->
+              Vhealth.showEntity 'http://dbpedia.org/resource/Salzburg'
+            jQuery("#loadAspirin").button().click ->
+              Vhealth.showEntity 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
+            jQuery("#loadEpilepsy").button().click ->
+              Vhealth.showEntity 'http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372'
+            jQuery("#showConfigBtn").button().click ->
+              alert(localStorage[Vhealth.lsName])
+            jQuery("#clearConfigBtn").button().click ->
+              delete localStorage[Vhealth.lsName];Vhealth.reloadEntity()
+            jQuery("#initConfigBtn").button().click ->
+              Vhealth.configInit()
+          </script>
         </div>
 <!--            <h4>selected:</h4>-->
 <!--            <div id="results"></div>-->
