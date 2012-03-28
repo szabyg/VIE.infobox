@@ -65,15 +65,29 @@ this.Vhealth = _(Vhealth).extend
     jQuery(".entity-types").html ""
     types = _(types).each (type) ->
       configured = _(configuredTypes).contains type.id
-      typeEl = jQuery "<button class='saveConfig'>save config for <b>#{Vhealth.shortenUri type.toString()}</b></button><br/>"
-      if configured
-        typeEl.addClass "savedTypeButton"
+      typeEl = jQuery """
+        <button class='saveConfig'>save config for <b>#{Vhealth.shortenUri type.toString()}</b></button>
+        <button class='removeConfig'><i class='icon-trash'/></button>
+        <br/>
+      """
       jQuery(".entity-types").append typeEl
+      if configured
+        typeEl.filter(".saveConfig").addClass "savedTypeButton"
+        typeEl.filter(".removeConfig").button
+          entityType: type
+        .click ->
+          type = jQuery(@).button "option", "entityType"
+          Vhealth.removeConfig type.toString()
+      else
+        typeEl.filter(".removeConfig").remove()
+
+
       typeEl.filter(".saveConfig").button
         entityType: type
       .click ->
         type = jQuery(@).button "option", "entityType"
         Vhealth.saveConfig type.toString()
+      
 
   # The propertyList is where all the draggable properties are listed
   showInPropertyList: (entity) ->
@@ -178,6 +192,18 @@ this.Vhealth = _(Vhealth).extend
     console.info localStorage[Vhealth.lsName]
     Vhealth.reloadEntity()
 
+  removeConfig: (typeUri) ->
+    localStorage[Vhealth.lsName] ?= "{}"
+    ls = null
+    try
+      ls = JSON.parse localStorage[Vhealth.lsName]
+    catch e
+      ls = {}
+    delete ls[typeUri]
+    localStorage[Vhealth.lsName] = JSON.stringify ls
+    console.info localStorage[Vhealth.lsName]
+    Vhealth.reloadEntity()
+    
   addBreadcrumb: (entityUri, label) ->
     jQuery(".breadcrumbs").append """
       &nbsp;| <a href='javascript:Vhealth.showEntity("#{entityUri}")'>#{label}</a>

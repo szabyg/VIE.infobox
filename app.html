@@ -34,7 +34,7 @@ jQuery(document).ready ->
     vie.use new vie.StanbolService(
       url: "http://dev.iks-project.eu:8081"
       enhancerUrlPostfix: "/enhancer/chain/ehealth"
-#      entityhubSite: "ehealth"
+      entityhubSite: "ehealth"
       proxyDisabled: true
       getSources: [
         uri: "www4.wiwiss.fu-berlin.de"
@@ -82,9 +82,9 @@ jQuery(document).ready ->
       config: ->
         localStorage[Vhealth.lsName]
     jQuery(".tabs").tabs(
-#      selected: 1
+      selected: 1
     )
-#    Vhealth.showEntity 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
+    Vhealth.showEntity 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
     </script>
 
     <style>
@@ -94,11 +94,13 @@ jQuery(document).ready ->
             background-color: #eee;
         }
         .info {
-            margin-top: 50px;
-            max-height: 80%;
-            border: 1px lightgreen solid;
-            overflow: auto;
 	          float: left;
+            margin-top: 50px;
+        }
+        .info .content {
+            border: 1px lightgreen solid;
+            max-height: 80%;
+            overflow: auto;
         }
         .info, .columns {
             width: 44%;
@@ -130,10 +132,15 @@ jQuery(document).ready ->
             float: left;
             margin: 10px;
         }
+        label {
+            font-weight: bold;
+        }
 	    .portlets { 
 	        padding-bottom: 10px; 
 	    }
 	    .savedTypeButton * {background-color: lightgreen;}
+	    .removeConfig * {background-color: red;}
+	    
 	    i {
 	        font-size: 100%;
 	        padding: 2px;
@@ -177,7 +184,7 @@ jQuery(document).ready ->
                       <div class="content portlets"></div>
                     </div>
                     <div class="columns">
-                        <label>current configuration</label>
+                        <label>Current configuration</label>
                         <div class="collector portlets"></div>
                         <div class="collector portlets"></div>
                         <div class="collector portlets"></div>
