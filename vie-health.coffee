@@ -297,6 +297,7 @@ jQuery.widget "Vie.portlet",
       element = @element
       @destroy()
       element.remove()
+    @configEl.hide()
     jQuery(".settings-button", @element).click =>
       @configEl.toggle()
     if @options.open
@@ -319,7 +320,6 @@ jQuery.widget "Vie.portlet",
   expand: ->
     jQuery(".toggle-button", @element).addClass("icon-minus").removeClass "icon-plus"
     @contentEl.show()
-    @configEl.show()
 
   setContent: (newContent) ->
     @contentEl.html newContent
