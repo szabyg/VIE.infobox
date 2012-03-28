@@ -54,6 +54,7 @@ this.Vhealth = _(Vhealth).extend
     .fail (e) ->
       console.error e
       alert e
+    false
 
   showTypesFor: (selectedEntity) ->
     # # handle types
@@ -110,7 +111,7 @@ this.Vhealth = _(Vhealth).extend
       @createPortlet Vhealth.shortenUri(key), val, entity, key, ".info .content"
 
     jQuery(".portlets").sortable connectWith: ".portlets"
-    jQuery(".portlets").disableSelection()
+#    jQuery(".portlets").disableSelection()
     false
 
   loadConfigEditor: (entity) ->
@@ -204,9 +205,12 @@ this.Vhealth = _(Vhealth).extend
     console.info localStorage[Vhealth.lsName]
     Vhealth.reloadEntity()
   configInit: ->
-    localStorage[Vhealth.lsName] = '{"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs>":[[{"property":"<http://www.w3.org/2004/02/skos/core#prefLabel>","fieldLabel":"Name"},{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/description>","fieldLabel":"Description"}],[],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target>","fieldLabel":"Targets"}],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/toxicity>","fieldLabel":"Toxicity"}]]}'
+    initConfig = JSON.parse """
+{"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs>":[[{"property":"<http://www.w3.org/2004/02/skos/core#prefLabel>","fieldLabel":"Name"},{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/description>","fieldLabel":"Description"}],[],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target>","fieldLabel":"Targets"}],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/toxicity>","fieldLabel":"Toxicity"}]]}
+    """
+    stored = JSON.parse(localStorage[Vhealth.lsName] or "{}")
+    localStorage[Vhealth.lsName] = JSON.stringify(_(stored).extend initConfig)
     Vhealth.reloadEntity()
-    
   addBreadcrumb: (entityUri, label) ->
     jQuery(".breadcrumbs").append """
       &nbsp;| <a href='javascript:Vhealth.showEntity("#{entityUri}")'>#{label}</a>

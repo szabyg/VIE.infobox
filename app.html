@@ -10,7 +10,8 @@
 
 <!--    <script type="text/javascript" src="lib/jquery-1.5.1.js"></script>-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
-    <script type="text/javascript" src="lib/jquery-ui.1.9m5.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
+<!--    <script type="text/javascript" src="lib/jquery-ui.1.9m5.js"></script>-->
     <script type="text/javascript" src="lib/underscore-min.js"></script>
     <script type="text/javascript" src="lib/backbone.js"></script>
 
@@ -55,13 +56,14 @@ jQuery(document).ready ->
 
     jQuery(".freetext").hallo
       plugins:
+        halloblock: {}
+        halloformat: {}
         halloannotate:
           vie: vie
           select: (e) ->
             Vhealth.showEntity e.originalEvent.ui.entityEnhancement.getUri()
           decline: (ui) ->
             console.info ui
-        halloformat: {}
 
       showAlways: true
       editable: true
@@ -200,13 +202,35 @@ jQuery(document).ready ->
                 </div>
             </div>
         </div>
-        <a href="javascript:Vhealth.showEntity('http://dbpedia.org/resource/Salzburg')">load Salzburg</a><br/><br/>
-        <a href="javascript:Vhealth.showEntity('http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945')">load Aspirin</a><br/>
-        <a href="javascript:Vhealth.showEntity('http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372')">load Epilepsy</a><br/><br/>
-        <a href="javascript:alert(localStorage[Vhealth.lsName])">show config JSON</a><br/>
-        <a href="javascript:delete localStorage[Vhealth.lsName];Vhealth.reloadEntity();">clear config</a><br/>
-        <a href="javascript:Vhealth.configInit()"><strong>load initial configuration</strong></a><br/>
 
+
+
+        <div class="ui-helper-clearfix ui-corner-all">
+          <div class="portlet-header ui-widget-header ui-corner-all">helpful shortcuts</div>
+          <div class="portlet-content vie-portlet-content">
+  <!--        <button id="loadSbg">load Salzburg</button><br/><br/>-->
+            <button id="loadAspirin">load Aspirin</button><br/>
+            <button id="loadEpilepsy">load Epilepsy</button><br/><br/>
+            <button id="showConfigBtn">show config JSON</button><br/>
+            <button id="clearConfigBtn">clear config</button><br/>
+            <button id="initConfigBtn">load initial configuration</button><br/>
+
+            <script type="text/coffeescript">
+              jQuery("#loadSbg").button().click ->
+                Vhealth.showEntity 'http://dbpedia.org/resource/Salzburg'
+              jQuery("#loadAspirin").button().click ->
+                Vhealth.showEntity 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
+              jQuery("#loadEpilepsy").button().click ->
+                Vhealth.showEntity 'http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372'
+              jQuery("#showConfigBtn").button().click ->
+                alert(localStorage[Vhealth.lsName])
+              jQuery("#clearConfigBtn").button().click ->
+                delete localStorage[Vhealth.lsName];Vhealth.reloadEntity()
+              jQuery("#initConfigBtn").button().click ->
+                Vhealth.configInit()
+            </script>
+          </div>
+        </div>
 <!--            <h4>selected:</h4>-->
 <!--            <div id="results"></div>-->
     </body>
