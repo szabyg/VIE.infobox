@@ -212,9 +212,17 @@ this.Vhealth = _(Vhealth).extend
     localStorage[Vhealth.lsName] = JSON.stringify(_(stored).extend initConfig)
     Vhealth.reloadEntity()
   addBreadcrumb: (entityUri, label) ->
-    jQuery(".breadcrumbs").append """
-      &nbsp;| <a href='javascript:Vhealth.showEntity("#{entityUri}")'>#{label}</a>
-    """
+    skip = false
+    commands = jQuery(".breadcrumbs a").map -> 
+      jQuery(@).attr 'href'
+    _(commands).each (command) ->
+      if command.indexOf(entityUri) isnt -1
+        skip = true
+    console.info "breadcrumbs:", commands
+    unless skip
+      jQuery(".breadcrumbs").append """
+        &nbsp;| <a href='javascript:Vhealth.showEntity("#{entityUri}")'>#{label}</a>
+      """
   getMatchingConfig: (entity, config) ->
     types = _([entity.get("@type")])
     .flatten()
