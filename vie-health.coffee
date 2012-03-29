@@ -221,7 +221,7 @@ this.Vhealth = _(Vhealth).extend
     console.info "breadcrumbs:", commands
     unless skip
       jQuery(".breadcrumbs").append """
-        &nbsp;| <a href='javascript:Vhealth.showEntity("#{entityUri}")'>#{label}</a>
+        &nbsp;| <a href='javascript:Vhealth.showEntity("#{entityUri}")' title="#{entityUri}" alt="#{entityUri}">#{label}</a>
       """
   getMatchingConfig: (entity, config) ->
     types = _([entity.get("@type")])
