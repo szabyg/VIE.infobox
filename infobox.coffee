@@ -57,8 +57,10 @@ jQuery.widget "Vie.infobox",
     @setEntity @options.entity
     @uniq = @_generateUUID()
     @element.addClass @uniq
+    @element.addClass 'vie-infobox'
 
   _destroy: ->
+    @element.removeClass @uniq
 
   _init: ->
     unless @options.entity
