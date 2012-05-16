@@ -3,8 +3,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="lib/jquery/jquery-ui.min.css" />
 
-    <link rel="stylesheet" href="css/hallo.css" />
-    <link rel="stylesheet" href="css/annotate.css" />
     <link rel="stylesheet" href="css/font-awesome.css" />
     <link rel="stylesheet" href="css/infobox.css" />
 
@@ -56,10 +54,7 @@
     jQuery('.infobox').infobox 'option', 'entity', 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
 
     </script>
-    <body xmlns:sioc    = "http://rdfs.org/sioc/ns#"
-         xmlns:schema   = "http://www.schema.org/"
-         xmlns:enhancer = "http://fise.iks-project.eu/ontology/"
-         xmlns:dc       = "http://purl.org/dc/terms/">
+    <body>
         <a href="https://github.com/szabyg/vie-health"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
         <h1>Infobox widget test page</h1>
@@ -69,28 +64,27 @@
             <div>
                 <h4>selected:</h4>
                 <div id="results"></div>
-          <button id="loadAspirin">load Aspirin</button><br/>
-          <button id="loadEpilepsy">load Epilepsy</button><br/><br/>
-          <button id="showConfigBtn">show config JSON</button><br/>
-          <button id="clearConfigBtn">clear config</button><br/>
-          <button id="initConfigBtn">load initial configuration</button><br/>
+            <button id="loadAspirin">load Aspirin</button><br/>
+            <button id="loadEpilepsy">load Epilepsy</button><br/><br/>
+            <button id="showConfigBtn">show config JSON</button><br/>
+            <button id="clearConfigBtn">clear config</button><br/>
+            <button id="initConfigBtn">load initial configuration</button><br/>
 
-          <script type="text/coffeescript">
-            jQuery("#loadSbg").button().click ->
-              jQuery('.infobox').infobox 'option', 'entity', 'http://dbpedia.org/resource/Salzburg'
-            jQuery("#loadAspirin").button().click ->
-              jQuery('.infobox').infobox 'option', 'entity', 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
-            jQuery("#loadEpilepsy").button().click ->
-              jQuery('.infobox').infobox 'option', 'entity', 'http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372'
-            jQuery("#showConfigBtn").button().click ->
-              alert(localStorage.vhealthConfig)
-            jQuery("#clearConfigBtn").button().click ->
-              delete localStorage[Vhealth.lsName];Vhealth.reloadEntity()
-            jQuery("#initConfigBtn").button().click ->
-              Vhealth.configInit()
-          </script>
-            </div>
-            
+            <script type="text/coffeescript">
+              jQuery("#loadSbg").button().click ->
+                jQuery('.infobox').infobox 'option', 'entity', 'http://dbpedia.org/resource/Salzburg'
+              jQuery("#loadAspirin").button().click ->
+                jQuery('.infobox').infobox 'option', 'entity', 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
+              jQuery("#loadEpilepsy").button().click ->
+                jQuery('.infobox').infobox 'option', 'entity', 'http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372'
+              jQuery("#showConfigBtn").button().click ->
+                alert(localStorage.vhealthConfig)
+              jQuery("#clearConfigBtn").button().click ->
+                delete localStorage[Vhealth.lsName];Vhealth.reloadEntity()
+              jQuery("#initConfigBtn").button().click ->
+                Vhealth.configInit()
+            </script>
+          </div>
         </div>
     </body>
 </html>
