@@ -41,5 +41,5 @@ creating such configurations
 
 # Demo
 
-Go to the (configurator)[http://szabyg.github.com/VIE.infobox/configurator.html] to see how you can browse a VIE repository and create configurations.
-Or go to the (infobox demo)[http://szabyg.github.com/VIE.infobox/infobox.html] and see how it can be shown.
+Go to the [configurator](http://szabyg.github.com/VIE.infobox/configurator.html) to see how you can browse a VIE repository and create configurations.
+Or go to the [infobox demo](http://szabyg.github.com/VIE.infobox/infobox.html) and see how it can be shown.
