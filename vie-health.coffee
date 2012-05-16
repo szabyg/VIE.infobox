@@ -1,6 +1,4 @@
 # TODO 
-# * Load and visualize config when an entity is loaded
-# * add property title config to each portlet
 # * add visualization options
 
 # uncomment this line if you'd like to be able to debug
@@ -223,6 +221,7 @@ this.Vhealth = _(Vhealth).extend
       jQuery(".breadcrumbs").append """
         &nbsp;| <a href='javascript:Vhealth.showEntity("#{entityUri}")' title="#{entityUri}" alt="#{entityUri}">#{label}</a>
       """
+
   getMatchingConfig: (entity, config) ->
     types = _([entity.get("@type")])
     .flatten()
@@ -265,105 +264,4 @@ this.Vhealth = _(Vhealth).extend
     @vie.namespaces.add "wdbp",            "http://www.dbpedia.org/resource/"
     @vie.namespaces.add "dbp",             "http://dbpedia.org/resource/"
     @vie.namespaces.add "dbpedia-page",    "http://dbpedia.org/"
-
-# Plain portlet
-jQuery.widget "Vie.portlet", 
-  options:
-    title: "default title"
-    open: true
-    configHtml: ""
-    alt: ""
-    configInit: (el) ->
-  _create: ->
-    @options.title = @element.attr("title") or @options.title
-    @element.addClass "vhealth-portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"
-    content = @element.contents()
-    @element.append """
-      <div class='portlet-header'>
-        <span class='portlet-header-label' alt=#{@options.alt} title=#{@options.alt}>#{@options.title}</span>
-      </div>
-    """
-    if @options.configHtml 
-      @element.append "<div class='portlet-content vie-portlet-config'>#{@options.configHtml}</div>"
-      @configEl = jQuery ".vie-portlet-config", @element
-      @options.configInit @configEl
-    @element.append "<div class='portlet-content vie-portlet-content'></div>"
-    @contentEl = jQuery '.vie-portlet-content', @element
-    @configEl = jQuery '.vie-portlet-config', @element
-    content.appendTo @contentEl
-
-    @headerEl = jQuery '.portlet-header', @element
-    @headerEl.addClass "ui-widget-header ui-corner-all"
-    if @options.configHtml then @headerEl.prepend " <i class='settings-button fa-icon icon-cog'></i> "
-    @headerEl.prepend " <i class='toggle-button fa-icon icon-plus'></i> "
-    @headerEl.prepend " <i class='x-button fa-icon icon-remove'></i> "
-
-    jQuery(".toggle-button, .portlet-header-label", @element).click (e) ->
-      jQuery(this).parent().find(".toggle-button").toggleClass("icon-minus").toggleClass "icon-plus"
-      if jQuery(this).parent().find(".toggle-button").hasClass "icon-plus" # collapsed
-        jQuery(this).parents(".vhealth-portlet:first").find(".vie-portlet-content, .vie-portlet-config").hide()
-      else
-        jQuery(this).parents(".vhealth-portlet:first").find(".vie-portlet-content").show()
-      e.preventDefault()
-    jQuery(".x-button", @element).click =>
-      element = @element
-      @destroy()
-      element.remove()
-    @configEl.hide()
-    jQuery(".settings-button", @element).click =>
-      @configEl.toggle()
-    if @options.open
-      @expand()
-    else
-      @collapse()
-
-  _destroy: ->
-    @element.removeClass 'vhealth-portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all'
-    content = @contentEl.contents()
-    content.appendTo @element
-    @contentEl.remove()
-    @headerEl.remove()
-
-  collapse: ->
-    jQuery(".toggle-button", @element).removeClass("icon-minus").addClass "icon-plus"
-    @contentEl.hide()
-    @configEl.hide()
-
-  expand: ->
-    jQuery(".toggle-button", @element).addClass("icon-minus").removeClass "icon-plus"
-    @contentEl.show()
-
-  setContent: (newContent) ->
-    @contentEl.html newContent
-
-jQuery.widget "Vie.infobox", 
-  options:
-    title: "default title"
-    vie: null
-    entity: null
-    config: {}
-    valueProcess: (value, fieldConfig) ->
-      value
-    keyProcess: (key) ->
-      _(key).escape()
-  _create: ->
-  _init: ->
-    unless @options.entity
-    else
-      @showInfo()
-  showInfo: ->
-    console.info "showing info in", @element
-    matchingConfig = @options.getMatchingConfig @options.entity, @options.config()
-
-    console.info "config:", matchingConfig
-    _(matchingConfig).each (box, i) =>
-      boxEl = jQuery "<div class='box'></div>"
-      _(box).each (field) =>
-        fieldLabel = @options.keyProcess field.property
-        value = @options.entity.get field.property
-        humanReadableValue = @options.valueProcess value, field
-        boxEl.append portletEl = jQuery("<div class='' title='#{field.fieldLabel}'>#{humanReadableValue}</div>")
-        portletEl.portlet
-          open: i is 0
-      @element.append boxEl
 

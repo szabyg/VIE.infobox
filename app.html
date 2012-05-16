@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="css/annotate.css" />
     <link rel="stylesheet" href="css/font-awesome.css" />
 
-<!--    <script type="text/javascript" src="lib/jquery-1.5.1.js"></script>-->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
+<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>-->
+    <script src="lib/jquery-1.6.1.min.js"></script>
+<!--    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>-->
+    <script src="lib/jquery-ui-1.8.12.min.js"></script>
 <!--    <script type="text/javascript" src="lib/jquery-ui.1.9m5.js"></script>-->
     <script type="text/javascript" src="lib/underscore-min.js"></script>
     <script type="text/javascript" src="lib/backbone.js"></script>
@@ -23,6 +24,7 @@
     <script type="text/javascript" src="lib/hallo.js"></script>
     <script type="text/javascript" src="lib/annotate.js"></script>
     <script type="text/javascript" src="lib/coffee-script.js"></script>
+    <script type="text/coffeescript" src="infobox.coffee"></script>
     <script type="text/coffeescript" src="vie-health.coffee"></script>
     <script type="text/coffeescript">
 # Initialize page
@@ -78,6 +80,7 @@ jQuery(document).ready ->
         _(jQuery(".vhealth-portlet", collector)).map (portlet) ->
           jQuery(portlet).portlet('option', 'title')
       console.info config
+
     jQuery(".infoBox").infobox
       vie: vie
       config: ->

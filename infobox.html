@@ -1,0 +1,134 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="lib/jquery/jquery-ui.min.css" />
+
+    <link rel="stylesheet" href="css/hallo.css" />
+    <link rel="stylesheet" href="css/annotate.css" />
+
+<!--    <script type="text/javascript" src="lib/jquery-1.5.1.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+    <script type="text/javascript" src="lib/jquery-ui.1.9m5.js"></script>
+    <script type="text/javascript" src="lib/underscore-min.js"></script>
+    <script type="text/javascript" src="lib/backbone.js"></script>
+
+    <script type="text/javascript" src="lib/jquery.rdfquery.min.js"></script>
+
+    <script type="text/javascript" src="lib/vie/vie-latest.debug.js"></script>
+
+    <script type="text/javascript" src="lib/vie.autocomplete.js"></script>
+    <script type="text/javascript" src="lib/hallo.js"></script>
+    <script type="text/javascript" src="lib/annotate.js"></script>
+
+    <script type="text/javascript" src="lib/coffee-script.js"></script>
+    <script type="text/coffeescript" src="infobox.coffee"></script>
+
+    <style>
+        body {
+            font-family: Verdana;
+            font-size: 15px;
+            background-color: #eee;
+        }
+        .info {
+            width: 24%;
+            height: 30%;
+            margin-top: 50px;
+            border: 1px red solid;
+            overflow: auto;
+	        float: right; 
+            right: 5px;
+        }
+        .freetext {
+            width: 55%;
+        }
+        .columns {
+            width: 100%;
+            float: left;
+            padding: 15px 5px;
+        }
+        .collector {
+            height: 100px;
+            width: 24%;
+            border: 1px red solid;
+            padding: 4px;
+	        float: left; 
+        }
+        .infobox {
+            width: 30%;
+            border: 1px #ccc solid;
+            float: right;
+        }
+
+	    .portlets { 
+	        /* width: 170px; */
+	        padding-bottom: 100px; 
+	    }
+	    .portlet { margin: 0 1em 1em 0; }
+	    .portlet-header { margin: 0.3em; padding-bottom: 4px; padding-left: 0.2em; }
+	    .portlet-header .ui-icon { float: right; }
+	    .portlet-content { padding: 0.4em; }
+	    .ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important; height: 50px !important; }
+	    .ui-sortable-placeholder * { visibility: hidden; }
+    </style>
+    <script type="text/coffeescript">
+# Initialize page
+  _.defer ->
+    vie = new VIE()
+    vie.use new vie.StanbolService(
+      url: "http://dev.iks-project.eu:8081"
+      enhancerUrlPostfix: "/enhancer/chain/ehealth"
+      entityhubSite: "ehealth"
+      proxyDisabled: true
+      getSources: [
+        uri: "www4.wiwiss.fu-berlin.de"
+        label: "ehealth"
+      ]
+    )
+    jQuery(".infoBox").infobox
+      vie: vie
+      service: "stanbol"
+      config: ->
+        localStorage.vhealthConfig
+
+    jQuery('.infobox').infobox 'option', 'entity', 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
+
+    </script>
+    <body xmlns:sioc    = "http://rdfs.org/sioc/ns#"
+         xmlns:schema   = "http://www.schema.org/"
+         xmlns:enhancer = "http://fise.iks-project.eu/ontology/"
+         xmlns:dc       = "http://purl.org/dc/terms/">
+        <a href="https://github.com/szabyg/vie-health"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+
+        <h1>Infobox widget test page</h1>
+        <div class="infobox"></div>
+            <h2 class="entityLabel"></h2>
+            <div class="entity-types"></div>
+            <div>
+                <h4>selected:</h4>
+                <div id="results"></div>
+          <button id="loadAspirin">load Aspirin</button><br/>
+          <button id="loadEpilepsy">load Epilepsy</button><br/><br/>
+          <button id="showConfigBtn">show config JSON</button><br/>
+          <button id="clearConfigBtn">clear config</button><br/>
+          <button id="initConfigBtn">load initial configuration</button><br/>
+
+          <script type="text/coffeescript">
+            jQuery("#loadSbg").button().click ->
+              jQuery('.infobox').infobox 'option', 'entity', 'http://dbpedia.org/resource/Salzburg'
+            jQuery("#loadAspirin").button().click ->
+              jQuery('.infobox').infobox 'option', 'entity', 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
+            jQuery("#loadEpilepsy").button().click ->
+              jQuery('.infobox').infobox 'option', 'entity', 'http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/372'
+            jQuery("#showConfigBtn").button().click ->
+              alert(localStorage.vhealthConfig)
+            jQuery("#clearConfigBtn").button().click ->
+              delete localStorage[Vhealth.lsName];Vhealth.reloadEntity()
+            jQuery("#initConfigBtn").button().click ->
+              Vhealth.configInit()
+          </script>
+<!--                Hyperthyroidism-->
+            </div>
+            
+        </div>
+    </body>
+</html>
