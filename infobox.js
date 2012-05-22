@@ -25,7 +25,15 @@ in the way it's described by the configuration object.
           ]
         )
 
-        config = {"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs>":[[{"property":"<http://www.w3.org/2004/02/skos/core#prefLabel>","fieldLabel":"Name"},{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/description>","fieldLabel":"Description"}],[],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target>","fieldLabel":"Targets"}],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/toxicity>","fieldLabel":"Toxicity"}]]}
+        config = {
+            "<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs>":[[
+                {
+                    "property":"<http://www.w3.org/2004/02/skos/core#prefLabel>"
+                    "fieldLabel":"Name"
+                    "template": "<img src='#{value}'/>"
+                }
+                {"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/description>","fieldLabel":"Description"}
+            ],[],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target>","fieldLabel":"Targets"}],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/toxicity>","fieldLabel":"Toxicity"}]]}
 
 see [config utility](http://szabyg.github.com/vie-health/app.html) for 
 creating such configurations
@@ -41,6 +49,7 @@ creating such configurations
 ## Telling the widget what entity to show
 
         jQuery('.infobox').infobox 'option', 'entity', 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
+        jQuery('.infobox').infobox('methodName', par1, par2)
 */
 
 
@@ -61,28 +70,27 @@ creating such configurations
       }
     },
     _create: function() {
-      this.setEntity(this.options.entity);
+      this._setEntity(this.options.entity);
       this.uniq = this._generateUUID();
       this.element.addClass(this.uniq);
       return this.element.addClass('vie-infobox');
     },
     _destroy: function() {
-      return this.element.removeClass(this.uniq);
+      this.element.removeClass(this.uniq);
+      return this.element.removeClass('vie-infobox');
     },
     _init: function() {
-      if (!this.options.entity) {
-
-      } else {
+      if (this.options.entity) {
         return this.showInfo();
       }
     },
     _setOption: function(key, value) {
       switch (key) {
         case "entity":
-          return this.setEntity(value);
+          return this._setEntity(value);
       }
     },
-    setEntity: function(entity) {
+    _setEntity: function(entity) {
       var _this = this;
       if (entity) {
         if (typeof entity === "string") {

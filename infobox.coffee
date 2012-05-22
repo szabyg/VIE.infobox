@@ -23,7 +23,15 @@ in the way it's described by the configuration object.
           ]
         )
 
-        config = {"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs>":[[{"property":"<http://www.w3.org/2004/02/skos/core#prefLabel>","fieldLabel":"Name"},{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/description>","fieldLabel":"Description"}],[],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target>","fieldLabel":"Targets"}],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/toxicity>","fieldLabel":"Toxicity"}]]}
+        config = {
+            "<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs>":[[
+                {
+                    "property":"<http://www.w3.org/2004/02/skos/core#prefLabel>"
+                    "fieldLabel":"Name"
+                    "template": "<img src='#{value}'/>"
+                }
+                {"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/description>","fieldLabel":"Description"}
+            ],[],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/target>","fieldLabel":"Targets"}],[{"property":"<http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/toxicity>","fieldLabel":"Toxicity"}]]}
 
 see [config utility](http://szabyg.github.com/vie-health/app.html) for 
 creating such configurations
@@ -39,6 +47,7 @@ creating such configurations
 ## Telling the widget what entity to show
 
         jQuery('.infobox').infobox 'option', 'entity', 'http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00945'
+        jQuery('.infobox').infobox('methodName', par1, par2)
 
 ###
 jQuery.widget "Vie.infobox", 
@@ -46,6 +55,7 @@ jQuery.widget "Vie.infobox",
     title: "default title"
     vie: null
     service: "stanbol"
+    # entity can be a URI or a VIE entity
     entity: null
     config: {}
     valueProcess: (value, fieldConfig) ->
@@ -54,41 +64,47 @@ jQuery.widget "Vie.infobox",
       _(key).escape()
 
   _create: ->
-    @setEntity @options.entity
+    @_setEntity @options.entity
     @uniq = @_generateUUID()
     @element.addClass @uniq
     @element.addClass 'vie-infobox'
 
   _destroy: ->
     @element.removeClass @uniq
+    @element.removeClass 'vie-infobox'
 
   _init: ->
-    unless @options.entity
-    else
+    if @options.entity
       @showInfo()
+
   _setOption: ( key, value ) ->
     switch key
       when "entity"
-        @setEntity value
+        @_setEntity value
 
-  setEntity: (entity) ->
+  # Set the entity for showing
+  _setEntity: (entity) ->
     if entity
       if typeof entity is "string"
+        # it's a URI
         @loadEntity entity, (res) =>
           @entity = res
           @showInfo()
       else
+        # it's already a VIE entity
         @entity = entity
         @showInfo()
     else
       @cleanUp()
 
+  # Load an entity from VIE and run callback
   loadEntity: (entityUri, cb) ->
     @entityUri = entityUri
     @options.vie.load(entity: entityUri).using(@options.service).execute().success (entities) ->
       cb _(entities).detect (ent) ->
         ent.getSubject().indexOf(entityUri) isnt -1
 
+  # Display this.options.entity
   showInfo: ->
     @cleanUp()
     console.info "showing info in", @element
