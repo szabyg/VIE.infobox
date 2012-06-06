@@ -183,7 +183,7 @@ this.Vhealth = _(Vhealth).extend
       ls = {}
     collectors = jQuery ".collector"
     ls[type] = _(collectors).map (collector) ->
-      _(jQuery(".vhealth-portlet", collector)).map (portlet) ->
+      _(jQuery(".infobox-portlet", collector)).map (portlet) ->
         property: jQuery(portlet).portlet('option', 'key')
         fieldLabel: jQuery('input.field-label', portlet).val()
     console.info type, ls[type]
